@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+
 interface ModeState {
   isDark: boolean;
   changeMode: () => void;

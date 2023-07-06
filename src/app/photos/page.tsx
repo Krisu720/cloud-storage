@@ -1,23 +1,62 @@
-import { prisma } from "@/utils/prismaSingleton";
+"use client";
+
+import PhotoPreview from "@/components/sections/PhotoPreview";
+import { Photos } from "@prisma/client";
+import axios from "axios";
 import Image from "next/image";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import Banner from "@/components/sections/Banner";
 
-const getPhotos = async () => {
-  const res = await prisma.photos.findMany();
-  return res;
-};
+const Photos = ({}) => {
+  const [photos, setPhotos] = useState<Photos[] | null>(null);
 
-const Photos = async ({}) => {
-  const photos = await getPhotos();
+  const [selected, setSelected] = useState<Photos | null>(null);
+
+  useEffect(() => {
+    const getPhotos = async () => {
+      const { data }: { data: Photos[] } = await axios.get("/api/photos");
+      if (data) {
+        setPhotos(data);
+      }
+    };
+    getPhotos();
+  }, []);
 
   return (
-    <div className="container mx-auto">
-      <div className="grid lg:grid-cols-8 md:grid-cols-5 sm:grid-cols-4 grid-cols-3 px-4 gap-2 mt-2">
-        {photos.map((item) => (
-          <div className="w-full h-full flex items-center justify-center shadow rounded bg-sky-500">
-            <Image className="" key={item.uuid} src={item.url} alt={item.url} height={400} width={500} />
-          </div>
-        ))}
+    <div className="">
+      <Banner />
+      <PhotoPreview selected={selected} setSelected={setSelected} />
+
+      <div className="grid lg:grid-cols-8 md:grid-cols-5 sm:grid-cols-4 grid-cols-3  gap-2 mt-6">
+        {photos !== null ? (
+          photos.map((item, index) => (
+            <motion.button
+              key={item.uuid}
+              initial={{ y: 25, opacity: 0 }}
+              animate={{
+                y: 0,
+                opacity: 1,
+                transition: { delay: index * 0.05 },
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              // layoutId={item.uuid}
+              onClick={() => setSelected(item)}
+              className="w-full h-40 flex items-center justify-center shadow rounded relative"
+            >
+              <Image
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                src={item.url}
+                alt={item.url}
+                fill
+                className="object-cover"
+              />
+            </motion.button>
+          ))
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );

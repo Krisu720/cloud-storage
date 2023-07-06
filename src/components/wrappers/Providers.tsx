@@ -1,7 +1,6 @@
 "use client";
 
 import { useModeStore } from "@/hooks/modeStore";
-import { FC } from "react";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   const { isDark } = useModeStore();

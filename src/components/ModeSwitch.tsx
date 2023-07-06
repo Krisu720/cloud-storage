@@ -1,29 +1,29 @@
 "use client";
 
-import { FC, useState } from "react";
+import { useState } from "react";
 import { SunIcon, MoonIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { useModeStore } from "@/hooks/modeStore";
 
 const ModeSwitch = ({}) => {
-  const { isDark,changeMode } = useModeStore();
+  const { isDark, changeMode } = useModeStore();
 
   const [dark, setDark] = useState<boolean>(isDark);
+  
   const handleMode = () => {
-     setDark((prev) => !prev);
-     changeMode();
+    setDark((prev) => !prev);
+    changeMode();
   };
 
   return (
     <motion.button
-    
       className={`h-8 w-14 border-black flex items-center p-1 border-2 rounded-full dark:border-white ${
         dark && "justify-end"
       }`}
       onClick={() => handleMode()}
     >
       <motion.div
-      transition={{duration:0.1}}
+        transition={{ duration: 0.1 }}
         layout
         className="h-6 w-6 rounded-full bg-black dark:bg-white"
       >
