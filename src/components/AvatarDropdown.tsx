@@ -1,63 +1,51 @@
 "use client";
 
-import { FC, useState } from "react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { LogOut, Wrench } from "lucide-react";
-import { useModeStore } from "@/hooks/modeStore";
-import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
+import Dropdown from "./ui/Dropdown";
+import { signOut } from "next-auth/react";
+import { useState } from "react";
+import SettingsDialog from "./sections/SettingsDialog";
 
-interface AvatarDropdownProps {
-  children: React.ReactNode;
-}
-
-const DropdownButton = ({ children }: { children: React.ReactNode }) => {
+const AvatarDropdown = ({
+  image,
+  email,
+}: {
+  image?: string | null;
+  email?: string | null;
+}) => {
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
   return (
-    <button className="h-10 w-52 px-4 hover:bg-gray-100 dark:hover:bg-black/20 flex gap-2 items-center">
-      {children}
-    </button>
-  );
-};
+    <>
+      <SettingsDialog open={openDialog} setOpen={setOpenDialog} />
 
-const AvatarDropdown: FC<AvatarDropdownProps> = ({ children }) => {
-  const { isDark } = useModeStore();
-  const [open, setOpen] = useState<boolean>(false);
-
-  return (
-    <DropdownMenu.Root open={open} onOpenChange={setOpen}>
-      <DropdownMenu.Trigger asChild>{children}</DropdownMenu.Trigger>
-
-      <AnimatePresence>
-        {open && (
-          <DropdownMenu.Portal forceMount>
-            <DropdownMenu.Content className={isDark ? "dark" : ""}>
-              <motion.div
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="py-3 bg-white dark:bg-neutral-800 shadow-2xl rounded  m-2"
-              >
-                <DropdownMenu.Item>
-                  <DropdownButton>
-                    <Wrench className="dark:text-white" />{" "}
-                    <span className="text-gray-900 dark:text-gray-100">
-                      Account settings
-                    </span>
-                  </DropdownButton>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item>
-                  <DropdownButton>
-                    <LogOut className="dark:text-white" />{" "}
-                    <span className="text-gray-900 dark:text-gray-100">
-                      Sign out
-                    </span>
-                  </DropdownButton>
-                </DropdownMenu.Item>
-              </motion.div>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        )}
-      </AnimatePresence>
-    </DropdownMenu.Root>
+      <Dropdown>
+        <Dropdown.Button>
+          <div className="h-12 w-12 bg-orange-500 rounded-full cursor-pointer object-contain relative overflow-hidden">
+            {image && <Image src={image} fill alt="avatar" />}
+            {email && (
+              <span className="flex items-center justify-center h-full w-full text-2xl uppercase text-white dark:text-black">
+                {email[0]}
+              </span>
+            )}
+          </div>
+        </Dropdown.Button>
+        <Dropdown.Menu>
+          <Dropdown.Item onSelect={() => setOpenDialog(true)}>
+            <Wrench className="dark:text-white" />
+            <span className="text-gray-900 dark:text-gray-100">
+              Account settings
+            </span>
+          </Dropdown.Item>
+          <Dropdown.Item
+            onSelect={() => signOut({ callbackUrl: "/", redirect: true })}
+          >
+            <LogOut className="dark:text-white" />{" "}
+            <span className="text-gray-900 dark:text-gray-100">Sign out</span>
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
+    </>
   );
 };
 

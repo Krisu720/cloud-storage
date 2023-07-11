@@ -2,12 +2,29 @@
 
 import { BadgeCheck, BadgeX } from "lucide-react";
 import { FC } from "react";
-import { motion } from "framer-motion";
+import { Variants, motion } from "framer-motion";
 import { PricingCardType } from "@/utils/mockData";
+import Heading from "./ui/Heading";
 
 interface PricingCardProps extends PricingCardType {
-    index: number
+  index: number;
 }
+
+const animation = (index: number) => {
+  const object: Variants = {
+    initial: { opacity: 0, y: 250 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        ease: [0.6, 0.01, 0.05, 0.95],
+        duration: 1,
+        delay: index * 0.05,
+      },
+    },
+  };
+  return object;
+};
 
 const PricingCard: FC<PricingCardProps> = ({
   title,
@@ -15,16 +32,11 @@ const PricingCard: FC<PricingCardProps> = ({
   benefits,
   price,
   recommended,
-  index
+  index,
 }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 250 }}
-      animate={{
-        opacity: 1,
-        y: 0,
-        transition: { ease: [0.6, 0.01, 0.05, 0.95], duration: 1,delay: index*0.05 },
-      }}
+      {...animation(index)}
       className={`border  rounded-lg flex flex-col mx-6 lg:mx-0 p-6 relative ${
         recommended ? "border-4 border-sky-500" : "border-gray-500"
       } `}
@@ -34,14 +46,26 @@ const PricingCard: FC<PricingCardProps> = ({
           Recommended
         </p>
       )}
-      <h1 className={`text-4xl  font-bold ${recommended ? "text-sky-500" : "dark:text-white"}`}>{title}</h1>
-      <p className="text-lg text-gray-500">{desc}</p>
+      <Heading
+        className={`text-4xl  font-bold ${
+          recommended ? "text-sky-500" : "dark:text-white"
+        }`}
+      >
+        {title}
+      </Heading>
+      <Heading size="lg" variant="secondary">
+        {desc}
+      </Heading>
       <button className="ring-sky-500 ring rounded h-10 text-sky-500 font-semibold text-lg my-4">
         Free
       </button>
       <div className="flex items-center gap-2">
-        <h1 className="text-3xl dark:text-white font-bold ">{price}</h1>
-        <p className="text-gray-500 font-bold">/ month</p>
+        <Heading size="xl" weight="bold">
+          {price}
+        </Heading>
+        <Heading weight="bold" variant="secondary">
+          / month
+        </Heading>
       </div>
       <div className="mt-4 flex flex-col gap-2">
         {benefits.map(({ name, status }) => (
@@ -49,13 +73,13 @@ const PricingCard: FC<PricingCardProps> = ({
             <BadgeCheck
               className={`${status ? "text-sky-500" : "text-gray-500"}`}
             />
-            <p
-              className={`text-gray-500 font-bold ${
-                status ? "" : "line-through"
-              }`}
+            <Heading
+              variant="secondary"
+              weight="semibold"
+              className={status ? "" : "line-through"}
             >
               {name}
-            </p>
+            </Heading>
           </div>
         ))}
       </div>

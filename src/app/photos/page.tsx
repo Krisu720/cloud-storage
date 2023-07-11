@@ -2,35 +2,28 @@
 
 import PhotoPreview from "@/components/sections/PhotoPreview";
 import { Photos } from "@prisma/client";
-import axios from "axios";
 import Image from "next/image";
-import { FC, useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import {motion } from "framer-motion";
 import Banner from "@/components/sections/Banner";
+import { getPhotos,photosEndpoint as cacheKey } from "@/utils/apiCalls";
+import useFetch from "@/hooks/useFetch";
 
 const Photos = ({}) => {
-  const [photos, setPhotos] = useState<Photos[] | null>(null);
-
+  const {data,isLoading,mutate} = useFetch<{photos:Photos[]}>(cacheKey,getPhotos)
   const [selected, setSelected] = useState<Photos | null>(null);
-
-  useEffect(() => {
-    const getPhotos = async () => {
-      const { data }: { data: Photos[] } = await axios.get("/api/photos");
-      if (data) {
-        setPhotos(data);
-      }
-    };
-    getPhotos();
-  }, []);
-
+ 
   return (
     <div className="">
       <Banner />
-      <PhotoPreview selected={selected} setSelected={setSelected} />
-
+      <PhotoPreview
+        selected={selected}
+        setSelected={setSelected}
+        mutate={mutate}
+      />
       <div className="grid lg:grid-cols-8 md:grid-cols-5 sm:grid-cols-4 grid-cols-3  gap-2 mt-6">
-        {photos !== null ? (
-          photos.map((item, index) => (
+        {data ? (
+          data.photos.map((item, index) => (
             <motion.button
               key={item.uuid}
               initial={{ y: 25, opacity: 0 }}

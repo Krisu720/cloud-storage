@@ -12,6 +12,7 @@ const ModeSwitch = ({}) => {
   
   const handleMode = () => {
     setDark((prev) => !prev);
+    localStorage.setItem("dark",JSON.stringify({dark}))
     changeMode();
   };
 

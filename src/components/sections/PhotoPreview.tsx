@@ -10,9 +10,10 @@ import * as Dialog from "@radix-ui/react-dialog";
 interface PhotoPreviewProps {
   selected: Photos | null;
   setSelected: React.Dispatch<React.SetStateAction<Photos | null>>;
+  mutate: () => void;
 }
 
-const PhotoPreview: FC<PhotoPreviewProps> = ({ selected, setSelected }) => {
+const PhotoPreview: FC<PhotoPreviewProps> = ({ selected, setSelected,mutate }) => {
   const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -35,7 +36,11 @@ const PhotoPreview: FC<PhotoPreviewProps> = ({ selected, setSelected }) => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <PreviewToolbar setSelected={setSelected} selected={selected} />
+                <PreviewToolbar
+                  setSelected={setSelected}
+                  selected={selected}
+                  mutate={mutate}
+                />
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

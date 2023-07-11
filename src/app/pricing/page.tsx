@@ -1,4 +1,5 @@
 import PricingCard from "@/components/PricingCard";
+import Heading from "@/components/ui/Heading";
 import { pricingCards } from "@/utils/mockData";
 
 
@@ -7,12 +8,12 @@ const page = ({}) => {
     <div className="flex justify-center items-center">
       <div className="flex flex-col gap-12 lg:mt-28 mt-12">
         <div className="text-center">
-          <h1 className="text-5xl dark:text-white font-extrabold tracking-tighter">
+          <Heading size="title" weight="extrabold">
             Pricing
-          </h1>
-          <p className="text-lg text-gray-500 font-semibold">
+          </Heading>
+          <Heading size="lg" variant="secondary" weight="semibold">
             Choose plan which you are intresed in!
-          </p>
+          </Heading>
         </div>
         <div className="grid lg:grid-cols-3 gap-12">
           {pricingCards.map((item,index) => (
