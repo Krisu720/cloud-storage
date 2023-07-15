@@ -1,11 +1,12 @@
 "use client";
 
 import { Upload, X } from "lucide-react";
-import Dialog from "./ui/Dialog";
+import Dialog from "../ui/Dialog";
 import { UploadDropzone } from "@/utils/uploadthing";
 import "@uploadthing/react/styles.css";
-
 const UploadButton = ({}) => {
+
+
   return (
     <Dialog>
       <Dialog.Button className="transition-colors hover:bg-black/20 rounded-full p-2 dark:text-white focus:outline outline-gray-100">

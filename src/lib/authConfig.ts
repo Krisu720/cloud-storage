@@ -1,13 +1,13 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
-import { prisma } from "./prismaSingleton";
+import { prisma } from "../utils/prismaSingleton";
 
 const authConfig: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
   pages: {
-    signIn: "/",
+    signIn: "/login",
   },
   providers: [
     CredentialsProvider({
@@ -42,6 +42,28 @@ const authConfig: NextAuthOptions = {
       },
     }),
   ],
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        return {
+          ...token,
+          userId: user.id,
+          plan: user.plan,
+        };
+      }
+      return token;
+    },
+    session({ session, token }) {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          plan: token.plan,
+          userId: token.userId,
+        },
+      };
+    },
+  },
 };
 
 export default authConfig;

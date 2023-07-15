@@ -1,17 +1,13 @@
 import { FC, ReactNode, useState } from "react";
-import {  motion } from "framer-motion";
-import {
-  ArrowLeft,
-  Download,
-  Loader2,
-  Share2,
-  Trash2,
-} from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowLeft, Download, Loader2, Share2, Trash2 } from "lucide-react";
 import { Photos } from "@prisma/client";
-import Tooltip from "./Tooltip";
-import {
-  deletePhoto,
-} from "@/utils/apiCalls";
+import Tooltip from "./ui/Tooltip";
+import { deletePhoto } from "@/lib/apiCalls";
+import Dialog from "./ui/Dialog";
+import ShareDialog from "./dialogs/ShareDialog";
+import { useSession } from "next-auth/react";
+
 interface PreviewToolbarProps {
   selected: Photos;
   setSelected: React.Dispatch<React.SetStateAction<Photos | null>>;
@@ -26,16 +22,20 @@ const PreviewToolbar: FC<PreviewToolbarProps> = ({
   const [deleteLoader, setDeleteLoader] = useState<boolean>(false);
   const [downloadLoader, setDownloadLoader] = useState<boolean>(false);
 
+  const { data } = useSession();
+
   const handleDelete = async (uuid: string) => {
-    setDeleteLoader(true);
-    const res = await deletePhoto(uuid);
-    setDeleteLoader(false);
-    mutate();
-    setSelected(null);
+    if (data?.user) {
+      setDeleteLoader(true);
+      const res = await deletePhoto(data.user.userId, uuid);
+      setDeleteLoader(false);
+      mutate();
+      setSelected(null);
+    }
   };
 
   const handleDownload = (url: string) => {
-    setDownloadLoader(true)
+    setDownloadLoader(true);
     fetch(url)
       .then((response) => response.blob())
       .then((blob) => {
@@ -46,10 +46,11 @@ const PreviewToolbar: FC<PreviewToolbarProps> = ({
         temporary.setAttribute("target", "_blank");
         temporary.click();
         URL.revokeObjectURL(href);
-        setDownloadLoader(false)
-      }).catch(()=>{
-        setDeleteLoader(false)
+        setDownloadLoader(false);
       })
+      .catch(() => {
+        setDeleteLoader(false);
+      });
   };
 
   return (
@@ -57,7 +58,7 @@ const PreviewToolbar: FC<PreviewToolbarProps> = ({
       initial={{ opacity: 0, y: -150 }}
       animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }}
       exit={{ opacity: 0, y: -150 }}
-      className="fixed top-10 left-10 right-10 z-20 flex justify-between bg-gray-500/60 p-1 rounded-full"
+      className="fixed top-10 left-10 right-10 z-30 flex justify-between bg-gray-500/60 p-1 rounded-full"
     >
       <ToolbarButton onClick={() => setSelected(null)}>
         <ArrowLeft className="text-white" />
@@ -84,9 +85,26 @@ const PreviewToolbar: FC<PreviewToolbarProps> = ({
             <Download className="text-white" />
           )}
         </ToolbarButton>
-        <ToolbarButton tooltipTitle="Share">
-          <Share2 className="text-white" />
-        </ToolbarButton>
+        <Dialog>
+          <Dialog.Button>
+            <ToolbarButton
+              tooltipTitle="Share"
+              className="relative inline-flex items-center justify-center z-10"
+            >
+              {selected.publicId && (
+                <div className="h-10 w-10 bg-green-700/70 rounded-full  animate-pulse absolute -z-10" />
+              )}
+              <Share2 className="text-white" />
+            </ToolbarButton>
+          </Dialog.Button>
+          <Dialog.Menu>
+            <ShareDialog
+              selected={selected}
+              setSelected={setSelected}
+              mutate={mutate}
+            />
+          </Dialog.Menu>
+        </Dialog>
       </div>
     </motion.div>
   );
@@ -96,17 +114,19 @@ const ToolbarButton = ({
   children,
   tooltipTitle,
   onClick,
+  className,
 }: {
   children: ReactNode;
   tooltipTitle?: string;
   onClick?: () => void;
+  className?: string;
 }) => {
   if (tooltipTitle) {
     return (
       <Tooltip title={tooltipTitle}>
         <button
           onClick={onClick}
-          className="hover:bg-black/20 dark:hover:bg-white/20 p-4 rounded-full transition-colors"
+          className={`hover:bg-black/20 dark:hover:bg-white/20 p-4 rounded-full transition-colors ${className}`}
         >
           {children}
         </button>

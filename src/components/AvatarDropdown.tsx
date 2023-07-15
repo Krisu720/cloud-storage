@@ -1,47 +1,67 @@
 "use client";
 
-import { LogOut, Wrench } from "lucide-react";
+import { LogOut, Wrench, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import Dropdown from "./ui/Dropdown";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
-import SettingsDialog from "./sections/SettingsDialog";
+import SettingsDialog from "./dialogs/SettingsDialog";
+import Link from "next/link";
+import { Session } from "next-auth";
+import Heading from "./ui/Heading";
 
-const AvatarDropdown = ({
-  image,
-  email,
-}: {
-  image?: string | null;
-  email?: string | null;
-}) => {
+const AvatarDropdown = ({ session }: { session: Session }) => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   return (
     <>
-      <SettingsDialog open={openDialog} setOpen={setOpenDialog} />
+      <SettingsDialog
+        open={openDialog}
+        setOpen={setOpenDialog}
+        session={session}
+      />
 
       <Dropdown>
         <Dropdown.Button>
-          <div className="h-12 w-12 bg-orange-500 rounded-full cursor-pointer object-contain relative overflow-hidden">
-            {image && <Image src={image} fill alt="avatar" />}
-            {email && (
-              <span className="flex items-center justify-center h-full w-full text-2xl uppercase text-white dark:text-black">
-                {email[0]}
-              </span>
+          <div
+            className={`md:h-12 md:w-12 w-8 h-8  cursor-pointer relative rounded-full overflow-hidden ${
+              session.user.image ? "" : "dark:bg-white bg-black "
+            }`}
+          >
+            {session.user.image && (
+              <Image
+                src={session.user.image}
+                className="object-cover"
+                fill
+                alt="avatar"
+              />
+            )}
+            {session.user.email && (
+              <Heading className="flex items-center justify-center h-full w-full md:text-2xl text-lg uppercase">
+                {session.user.email[0]}
+              </Heading>
             )}
           </div>
         </Dropdown.Button>
         <Dropdown.Menu>
+          <Link href="/photos">
+            <Dropdown.Item>
+              <ImageIcon className="dark:text-white" />
+              <Heading >
+                My gallery
+              </Heading>
+            </Dropdown.Item>
+          </Link>
           <Dropdown.Item onSelect={() => setOpenDialog(true)}>
             <Wrench className="dark:text-white" />
-            <span className="text-gray-900 dark:text-gray-100">
+            <Heading >
               Account settings
-            </span>
+            </Heading>
           </Dropdown.Item>
           <Dropdown.Item
             onSelect={() => signOut({ callbackUrl: "/", redirect: true })}
           >
             <LogOut className="dark:text-white" />{" "}
-            <span className="text-gray-900 dark:text-gray-100">Sign out</span>
+            <Heading >Sign out</Heading>
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>

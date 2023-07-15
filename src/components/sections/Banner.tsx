@@ -1,24 +1,47 @@
-import Link from "next/link";
-import { FC } from "react";
-import Heading from "../ui/Heading";
+"use client";
 
-const Banner = ({}) => {
+import Heading from "../ui/Heading";
+import { getPhotosInfo } from "@/lib/apiCalls";
+import { Session } from "next-auth";
+import useSWR from "swr";
+
+const Banner = ({ session }: { session: Session }) => {
+  const userId = session.user.userId;
+
+  const { data } = useSWR<{
+    size: number;
+    number: number;
+    sharedNumber: number;
+  }>("/api/photos/info/" + userId, () => getPhotosInfo(userId));
+
   return (
-    <div className="grid  overflow-y-auto   md:grid-cols-3 gap-6 grid-rows-1 grid-flow-row">
-      <div className="border rounded-xl py-8 px-6">
-        <Heading size="xl" weight="semibold">Usage</Heading>
+    <div className="flex snap-x snap-mandatory   overflow-x-auto  gap-2 ">
+      <div className="border rounded-xl py-8 px-6 w-11/12 md:w-1/3 snap-center flex-shrink-0 md:flex-shrink">
+        <Heading size="xl" weight="semibold">
+          Usage
+        </Heading>
         <Heading variant="secondary">Total</Heading>
-        <Heading size="xl" weight="bold" className="mt-3">132.53MB <span className="text-gray-500 text-base">/ 500.00MB (23.2%)</span></Heading>
+        <Heading size="xl" weight="bold" className="mt-3">
+          {data && Math.round(data.size * 100) / 100}MB
+        </Heading>
       </div>
-      <div className="border rounded-xl py-8 px-6">
-        <Heading size="xl" weight="semibold">Total Photos</Heading>
+      <div className="border rounded-xl py-8 px-6 w-11/12 md:w-1/3 snap-center flex-shrink-0 md:flex-shrink">
+        <Heading size="xl" weight="semibold">
+          Total Photos
+        </Heading>
         <Heading variant="secondary">All time</Heading>
-        <Heading size="xl" weight="bold" className="mt-3">12</Heading>
+        <Heading size="xl" weight="bold" className="mt-3">
+          {data && data.number}
+        </Heading>
       </div>
-      <div className="border rounded-xl py-8 px-6">
-        <Heading size="xl" weight="semibold">Current Plan</Heading>
-        <Heading variant="secondary">Manage and view your current plan</Heading>
-        <Heading size="xl" weight="bold" className="mt-3">Free (500MB) <Link href="/pricing" className="text-sky-500 text-base font-normal hover:underline">change</Link></Heading>
+      <div className="border rounded-xl py-8 px-6 w-11/12 md:w-1/3 snap-center flex-shrink-0 md:flex-shrink">
+        <Heading size="xl" weight="semibold">
+          Shared Photos
+        </Heading>
+        <Heading variant="secondary">Total</Heading>
+        <Heading size="xl" weight="bold" className="mt-3">
+          {data && data.sharedNumber}
+        </Heading>
       </div>
     </div>
   );

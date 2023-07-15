@@ -1,11 +1,11 @@
 import { Cloud, LogIn } from "lucide-react";
 import ModeSwitch from "../ModeSwitch";
 import Link from "next/link";
-import UploadButton from "../UploadButton";
+import UploadButton from "../dialogs/UploadButton";
 import AvatarDropdown from "../AvatarDropdown";
 import Heading from "../ui/Heading";
 import { getServerSession } from "next-auth";
-import authConfig from "@/utils/authConfig";
+import authConfig from "@/lib/authConfig";
 const Navbar = async ({}) => {
   const session = await getServerSession(authConfig);
 
@@ -13,7 +13,7 @@ const Navbar = async ({}) => {
     <>
       <div className="py-6 flex justify-between ">
         <div className="flex items-center">
-          <Link className="flex items-center" href="/photos">
+          <Link className="flex items-center" href="/">
             <Heading size="xl" weight="semibold" className="md:text-4xl">
               cloud<span className="text-sky-500">storage</span>
             </Heading>
@@ -25,12 +25,11 @@ const Navbar = async ({}) => {
           <ModeSwitch />
           {session?.user ? (
             <AvatarDropdown
-              image={session.user.image}
-              email={session.user.email}
+              session={session}
             />
           ) : (
             <Link
-              href="/"
+              href="/login"
               className="transition-colors hover:bg-black/20 rounded-full p-2 dark:text-white focus:outline outline-gray-100"
             >
               <LogIn />
