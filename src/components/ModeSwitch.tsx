@@ -6,21 +6,18 @@ import { motion } from "framer-motion";
 import { useModeStore } from "@/hooks/modeStore";
 
 const ModeSwitch = ({}) => {
-  const { isDark, changeMode } = useModeStore();
-
+  const { isDark, setMode } = useModeStore();
   const [dark, setDark] = useState<boolean>(isDark);
-  
+
   const handleMode = () => {
     setDark((prev) => !prev);
-    localStorage.setItem("dark",JSON.stringify({dark}))
-    changeMode();
+    setMode(!dark)
+    localStorage.setItem("dark", JSON.stringify({ dark: !dark }));
   };
 
   return (
     <motion.button
-      className={`h-8 w-14 border-black flex items-center p-1 border-2 rounded-full dark:border-white ${
-        dark && "justify-end"
-      }`}
+      className="h-8 w-14 border-black flex items-center p-1 border-2 rounded-full dark:border-white dark:justify-end"
       onClick={() => handleMode()}
     >
       <motion.div

@@ -1,8 +1,8 @@
 "use client";
 
 import { useModeStore } from "@/hooks/modeStore";
-import Persitor from "./Persitor";
 import { SessionProvider } from "next-auth/react";
+import { useEffect } from "react";
 
 const Providers = ({
   children,
@@ -11,12 +11,20 @@ const Providers = ({
   children: React.ReactNode;
   className: string;
 }) => {
-  const { isDark } = useModeStore();
+
+  const { isDark, setMode } = useModeStore();
+
+  useEffect(() => {
+    const storage = localStorage.getItem("dark");
+    if (storage) {
+      const { dark }: { dark: boolean } = JSON.parse(storage);
+      setMode(dark);
+    }
+  }, []);
 
   return (
     <body className={`${isDark && "dark bg-black"} ${className}`}>
       <SessionProvider>
-        <Persitor />
         {children}
       </SessionProvider>
     </body>

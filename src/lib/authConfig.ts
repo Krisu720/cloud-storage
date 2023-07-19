@@ -1,7 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
 import { prisma } from "../utils/prismaSingleton";
-
+import {compare} from 'bcrypt'
 const authConfig: NextAuthOptions = {
   session: {
     strategy: "jwt",
@@ -31,7 +31,9 @@ const authConfig: NextAuthOptions = {
 
         if (!res) return null;
 
-        if (res.password !== credentials.password) return null;
+        const isPasswordValid = await compare(credentials.password,res.password);
+
+        if (!isPasswordValid) return null;
 
         return {
           id: res.id,

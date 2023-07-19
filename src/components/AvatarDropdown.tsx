@@ -36,7 +36,7 @@ const AvatarDropdown = ({ session }: { session: Session }) => {
               />
             )}
             {session.user.email && (
-              <Heading className="flex items-center justify-center h-full w-full md:text-2xl text-lg uppercase">
+              <Heading className="flex items-center justify-center h-full w-full md:text-2xl text-lg uppercase dark:text-black text-white">
                 {session.user.email[0]}
               </Heading>
             )}

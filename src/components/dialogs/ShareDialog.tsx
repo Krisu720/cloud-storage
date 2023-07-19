@@ -29,7 +29,7 @@ const ShareDialog: FC<ShareDialogProps> = ({
   const copyText = () => {
     if (selected.publicId) {
       navigator.clipboard.writeText(
-        `http://localhost:3000/preview/${selected.publicId}`
+        `${window.location.origin}/preview/${selected.publicId}`
       );
       setCopied(true);
     }
@@ -121,7 +121,7 @@ const ShareDialog: FC<ShareDialogProps> = ({
         <div className="flex mt-4">
           <Input
             className="w-full items-center select-none text-gray-600"
-            value={`http://localhost:3000/preview/${
+            value={`${window.location.origin}/preview/${
               selected.publicId ? selected.publicId : undefined
             }`}
             readOnly
