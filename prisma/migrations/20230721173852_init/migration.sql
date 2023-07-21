@@ -6,6 +6,7 @@ CREATE TABLE "Photos" (
     "uuid" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "url" TEXT NOT NULL,
+    "size" INTEGER NOT NULL,
     "publicId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
@@ -14,7 +15,7 @@ CREATE TABLE "Photos" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
+    "email" VARCHAR(255) NOT NULL,
     "password" TEXT NOT NULL,
     "image" TEXT,
     "plan" "Plan" NOT NULL DEFAULT 'MB500'
