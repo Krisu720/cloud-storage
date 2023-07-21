@@ -14,14 +14,14 @@ export const DELETE = async (
   const res = await prisma.photos.findUnique({ where: { uuid: id } });
   if (!res)
     return NextResponse.json(
-      { message: "Photo havent been found" },
+      { message: "Photo not found" },
       { status: 404 }
     );
-  const utId = res.url.slice(26);
+  const uploadthingId = res.url.slice(26);
 
-  const utRes = await utapi.deleteFiles(decodeURI(utId));
+  const uploadthingRes = await utapi.deleteFiles(decodeURI(uploadthingId));
 
-  if (utRes.success) {
+  if (uploadthingRes.success) {
     await prisma.photos.delete({ where: { uuid: id } });
     return NextResponse.json({ message: "Deleted" }, { status: 200 });
   } else {

@@ -11,13 +11,13 @@ const getAuthFetch = (userId: string) => {
 //ENDPOINTS
 
 export const PHOTOS_ENDPOINT = "/api/photos/";
-
+export const ACCOUNT_ENDPOINT = "/api/account/"
 //CALLS
 
 //AUTH
 
 export const registerUser = async (email: string,password:string) => {
-  const res = await axios.post("/api/account",{email,password});
+  const res = await axios.post(ACCOUNT_ENDPOINT,{email,password});
   console.log(res.data)
   return res.data;
 };
@@ -29,22 +29,22 @@ export const getPhotos = async (userId: string) => {
   return res.data;
 };
 
-export const deletePhoto = async (userId: string, uuid: string) => {
+export const deletePhoto = async (userId: string, photoId: string) => {
   const authFetch = getAuthFetch(userId);
-  const res = await authFetch.delete(PHOTOS_ENDPOINT + userId + "/" + uuid);
+  const res = await authFetch.delete(PHOTOS_ENDPOINT + userId + "/" + photoId);
   return res.data;
 };
 
 //ACCOUNT
 export const changeImage = async (userId: string, photoId: string) => {
   const authFetch = getAuthFetch(userId);
-  const res = await authFetch.post("/api/account/photo/" + userId, { photoId });
+  const res = await authFetch.post(ACCOUNT_ENDPOINT+"photo/" + userId, { photoId });
   return res.data;
 };
 
 export const changePassword = async (userId: string, password:string,newPassword:string) => {
   const authFetch = getAuthFetch(userId);
-  const res = await authFetch.post("/api/account/password/" + userId, { password,newPassword });
+  const res = await authFetch.post(ACCOUNT_ENDPOINT+"password/" + userId, { password,newPassword });
   return res.data;
 };
 
@@ -66,7 +66,7 @@ export const removePublicPhoto = async (userId: string, photoId: string) => {
 };
 
 //PUBLIC
-export const findPublicPhoto = async (photoId: string) => {
-  const res = await axios.get("/api/public/" + photoId);
+export const findPublicPhoto = async (publicPhotoId: string) => {
+  const res = await axios.get("/api/public/" + publicPhotoId);
   return res.data;
 };

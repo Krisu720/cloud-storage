@@ -24,14 +24,16 @@ export default function Home() {
               cloud<span className="text-sky-500">storage</span>
             </Heading>
             <Cloud className="text-sky-500 h-16 w-16" />
+            
           </div>
+          
           <Heading
             variant="secondary"
             size="lg"
             weight="semibold"
             className="text-center"
           >
-            Transfer your photo's from any device easily and keep important
+            Transfer your photo&apos;s from any device easily and keep important
             images in your cloud.
           </Heading>
           <div className="w-full flex justify-center mt-6">

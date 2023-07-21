@@ -1,7 +1,7 @@
 import { prisma } from "@/utils/prismaSingleton";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import {hash,compare} from "bcrypt";
+import { hash, compare } from "bcrypt";
 interface Params {
   userId: string;
 }
