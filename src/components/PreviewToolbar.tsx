@@ -7,29 +7,31 @@ import { deletePhoto } from "@/lib/apiCalls";
 import Dialog from "./ui/Dialog";
 import ShareDialog from "./dialogs/ShareDialog";
 import { useSession } from "next-auth/react";
-
+import {useRouter} from 'next/navigation'
+import { useToast } from "@/hooks/toastStore";
 interface PreviewToolbarProps {
   selected: Photos;
   setSelected: React.Dispatch<React.SetStateAction<Photos | null>>;
-  mutate: () => void;
 }
 
 const PreviewToolbar: FC<PreviewToolbarProps> = ({
   selected,
   setSelected,
-  mutate,
 }) => {
+  const router = useRouter()
   const [deleteLoader, setDeleteLoader] = useState<boolean>(false);
   const [downloadLoader, setDownloadLoader] = useState<boolean>(false);
 
   const { data } = useSession();
+  const {toast} = useToast()
 
   const handleDelete = async (uuid: string) => {
     if (data?.user) {
       setDeleteLoader(true);
       const res = await deletePhoto(data.user.userId, uuid);
       setDeleteLoader(false);
-      mutate();
+      toast({title: "Image has been deleted."})
+      router.refresh();
       setSelected(null);
     }
   };
@@ -101,7 +103,6 @@ const PreviewToolbar: FC<PreviewToolbarProps> = ({
             <ShareDialog
               selected={selected}
               setSelected={setSelected}
-              mutate={mutate}
             />
           </Dialog.Menu>
         </Dialog>

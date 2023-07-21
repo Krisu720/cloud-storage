@@ -1,18 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { SunIcon, MoonIcon } from "lucide-react";
 import { motion } from "framer-motion";
-import { useModeStore } from "@/hooks/modeStore";
+import { useTheme } from "next-themes";
 
 const ModeSwitch = ({}) => {
-  const { isDark, setMode } = useModeStore();
-  const [dark, setDark] = useState<boolean>(isDark);
+  const { theme, setTheme } = useTheme();
 
   const handleMode = () => {
-    setDark((prev) => !prev);
-    setMode(!dark)
-    localStorage.setItem("dark", JSON.stringify({ dark: !dark }));
+    setTheme(theme === "light" ? "dark" : "light");
   };
 
   return (
@@ -25,7 +21,7 @@ const ModeSwitch = ({}) => {
         layout
         className="h-6 w-6 rounded-full bg-black dark:bg-white"
       >
-        {dark ? (
+        {theme === "dark" ? (
           <MoonIcon className="text-white dark:text-black p-1" />
         ) : (
           <SunIcon className="text-white dark:text-black p-1" />

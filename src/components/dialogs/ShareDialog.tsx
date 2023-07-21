@@ -10,18 +10,20 @@ import { AnimatePresence, Variants, motion } from "framer-motion";
 import { Photos } from "@prisma/client";
 import { setPublicPhoto, removePublicPhoto } from "@/lib/apiCalls";
 import { useSession } from "next-auth/react";
+import {useRouter} from 'next/navigation'
+import { useToast } from "@/hooks/toastStore";
 interface ShareDialogProps {
   selected: Photos;
   setSelected: React.Dispatch<React.SetStateAction<Photos | null>>;
-  mutate: () => void;
 }
 
 const ShareDialog: FC<ShareDialogProps> = ({
   selected,
   setSelected,
-  mutate,
 }) => {
+  const router = useRouter()
   const session = useSession();
+  const {toast} = useToast()
   const [status, setStatus] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -33,16 +35,18 @@ const ShareDialog: FC<ShareDialogProps> = ({
       );
       setCopied(true);
     }
+    toast({title: "Copied to clipboard."})
   };
 
   const setPublic = async () => {
     if (session.data?.user.userId) {
       setLoading(true);
       const res = await setPublicPhoto(session.data.user.userId, selected.uuid);
-      mutate();
+      router.refresh()
       setSelected({ ...res });
       setLoading(false);
     }
+    toast({title: "This photo is public now."})
   };
 
   const removePublic = async () => {
@@ -53,10 +57,11 @@ const ShareDialog: FC<ShareDialogProps> = ({
         selected.uuid
       );
       console.log(res);
-      mutate();
+      router.refresh()
       setSelected({ ...res });
       setLoading(false);
     }
+    toast({title: "This photo is not public anymore."})
   };
 
   useEffect(() => {

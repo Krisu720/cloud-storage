@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+[data-theme="dark"] body {
+	background-color: rgb(23 23 23);
+}
 
 .gradient {
     background: radial-gradient(circle, rgba(0,219,255,1) 10%, rgba(255, 255, 255, 0) 60%);

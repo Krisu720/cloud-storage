@@ -11,7 +11,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { registerUser } from "@/lib/apiCalls";
 import ErrorSpan from "../ErrorSpan";
-
+import Link from "next/link";
+import { AxiosError } from "axios";
+import { useToast } from "@/hooks/toastStore";
+import { useRouter } from "next/navigation";
 const LoginValidator = z.object({
   email: z
     .string()
@@ -35,7 +38,7 @@ const LoginValidator = z.object({
     ),
 });
 
-const LoginForm: FC = ({}) => {
+const RegisterForm: FC = ({}) => {
   const {
     register,
     handleSubmit,
@@ -44,17 +47,28 @@ const LoginForm: FC = ({}) => {
     resolver: zodResolver(LoginValidator),
   });
 
-  const [loading, setLoading] = useState(false);
+  const router = useRouter()
 
-  const searchParams = useSearchParams();
-  const error = searchParams.get("error");
+  const { toast } = useToast();
+
+  const [loading, setLoading] = useState(false);
 
   const handler: SubmitHandler<z.infer<typeof LoginValidator>> = async (
     data
   ) => {
-    setLoading(true)
-    const res = await registerUser(data.email,data.passwordForm.password)
-    setLoading(false)
+    setLoading(true);
+    try {
+      const res = await registerUser(data.email, data.passwordForm.password);
+      toast({title: "Account created"})
+      router.push("/login")
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        if (e.response?.statusText) {
+          toast({ title: e.response.statusText, type: "error" });
+        }
+      }
+    }
+    setLoading(false);
   };
 
   return (
@@ -62,7 +76,7 @@ const LoginForm: FC = ({}) => {
       className="flex flex-col  gap-2 mt-4"
       onSubmit={handleSubmit(handler)}
     >
-      <fieldset disabled={loading} className="group">
+      <fieldset disabled={loading} className="group space-y-2">
         <label className="flex flex-col dark:text-white ">
           <span className=" text-sm">Email</span>
           <Input
@@ -92,16 +106,11 @@ const LoginForm: FC = ({}) => {
           {errors.passwordForm?.message && (
             <ErrorSpan>{errors.passwordForm.message}</ErrorSpan>
           )}
-          {error && (
-            <div className="border border-red-700 bg-red-300 rounded-xl p-3 font-semibold mt-2">
-              Account with this email exist
-            </div>
-          )}
         </div>
 
         <Button
           type="submit"
-          className="mt-5 inline-flex items-center relative"
+          className="inline-flex items-center relative"
           disabled={loading}
         >
           <Loader2
@@ -111,10 +120,14 @@ const LoginForm: FC = ({}) => {
           <span className="group-disabled:opacity-0">Register</span>
         </Button>
       </fieldset>
+      <span>
+        Have an account?{" "}
+        <Link href="login" className="text-sky-500 hover:underline">
+          Sign in!
+        </Link>
+      </span>
     </form>
   );
 };
 
-export default LoginForm;
-
-
+export default RegisterForm;

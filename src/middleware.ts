@@ -4,10 +4,14 @@ import { NextRequest, NextResponse } from "next/server";
 export default withAuth(
   function middleware(request: NextRequestWithAuth) {
    
+    const header = request.headers.get("userId")?.split(" ")[1]
+    const token = request.nextauth.token?.userId
+
+    console.log("HEADER:",header,"TOKEN:",token)
+
     if (
       request.nextUrl.pathname.startsWith("/api/photos") &&
-      request.headers.get("userId")?.split(" ")[1] !==
-        request.nextauth.token?.userId
+        header !== token
     ) {
       return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
     }

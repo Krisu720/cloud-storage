@@ -42,9 +42,9 @@ export const changeImage = async (userId: string, photoId: string) => {
   return res.data;
 };
 
-export const getPhotosInfo = async (userId: string) => {
+export const changePassword = async (userId: string, password:string,newPassword:string) => {
   const authFetch = getAuthFetch(userId);
-  const res = await authFetch.get(PHOTOS_ENDPOINT + "info/" + userId);
+  const res = await authFetch.post("/api/account/password/" + userId, { password,newPassword });
   return res.data;
 };
 

@@ -2,15 +2,19 @@
 
 import { FC, useState } from "react";
 import Dialog from "../ui/Dialog";
-import { Button } from "../ui/Button";
+import { Button, buttonVariants } from "../ui/Button";
 import Heading from "../ui/Heading";
 import { X } from "lucide-react";
 import { Session } from "next-auth";
 import { Input } from "../ui/Input";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler, set } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ErrorSpan from "../ErrorSpan";
+import { changePassword } from "@/lib/apiCalls";
+import { AxiosError } from "axios";
+import { useToast } from "@/hooks/toastStore";
+import { cn } from "@/utils/stylingHelper";
 
 interface ChangePasswordDialogProps {
   session: Session;
@@ -48,20 +52,35 @@ const ChangePasswordDialog: FC<ChangePasswordDialogProps> = ({ session }) => {
     resolver: zodResolver(LoginValidator),
   });
 
+
   const [loading, setLoading] = useState<boolean>(false);
+  const { toast } = useToast();
 
- 
-
-  const handler = async () => {
+  const handler: SubmitHandler<z.infer<typeof LoginValidator>> = async (
+    data
+  ) => {
     setLoading(true);
-    setTimeout(()=>setLoading(false),1000)
-    
+    try {
+      const res = await changePassword(
+        session.user.userId,
+        data.password,
+        data.passwordForm.confirm
+      );
+      toast({title: "Password has been changed."})
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        if (e.response?.statusText)
+          toast({ title: e.response.statusText, type: "error" });
+        else toast({ title: "Something went wrong.", type: "error" });
+      }
+    }
+    setLoading(false);
   };
 
   return (
     <Dialog>
-      <Dialog.Button>
-        <Button size="small">Change password</Button>
+      <Dialog.Button className={cn(buttonVariants({size: "small"}))}>
+        Change password
       </Dialog.Button>
       <Dialog.Menu>
         <div className="flex justify-between">
@@ -96,11 +115,10 @@ const ChangePasswordDialog: FC<ChangePasswordDialogProps> = ({ session }) => {
               )}
             </label>
             <div className="mt-12">
- 
-            {errors.passwordForm?.message && (
-              <ErrorSpan>{errors.passwordForm.message}</ErrorSpan>
+              {errors.passwordForm?.message && (
+                <ErrorSpan>{errors.passwordForm.message}</ErrorSpan>
               )}
-              </div>
+            </div>
             <Button variant="success" className="mt-4">
               Change
             </Button>

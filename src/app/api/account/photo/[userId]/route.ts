@@ -8,6 +8,6 @@ export const POST = async (request: Request, { params }: { params: Params }) => 
   const getImgUrl = await prisma.photos.findUnique({where:{uuid: photoId}})
   if(!getImgUrl) return NextResponse.json({message: "image not found"},{status:404})
 
-  const xd = await prisma.user.update({where: {id: params.userId},data: {image: getImgUrl.url}})
-  return NextResponse.json({message: "image changed"});
+  const res = await prisma.user.update({where: {id: params.userId},data: {image: getImgUrl.url}})
+  return NextResponse.json({image: res.image});
 };

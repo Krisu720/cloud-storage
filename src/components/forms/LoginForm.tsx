@@ -7,6 +7,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 
 interface Inputs {
   email: string;
@@ -41,7 +42,7 @@ const LoginForm: FC = ({}) => {
       className="flex flex-col  gap-2 mt-4"
       onSubmit={handleSubmit(handler)}
     >
-      <fieldset disabled={loading} className="group">
+      <fieldset disabled={loading} className="group space-y-2">
         <label className="flex flex-col dark:text-white ">
           <span className=" text-sm">Email</span>
           <Input
@@ -74,13 +75,13 @@ const LoginForm: FC = ({}) => {
           )}
         </label>
         {error && (
-          <div className="border border-red-700 bg-red-300 rounded-xl p-3 font-semibold mt-2">
+          <div className="border border-red-800 dark:border-red-300 bg-red-300 dark:bg-red-800 rounded-xl p-3 font-semibold mt-2">
             Wrong Credentials.
           </div>
         )}
         <Button
           type="submit"
-          className="mt-5 inline-flex items-center relative"
+          className="inline-flex items-center relative"
           disabled={loading}
         >
           <Loader2
@@ -90,6 +91,7 @@ const LoginForm: FC = ({}) => {
           <span className="group-disabled:opacity-0">Log in</span>
         </Button>
       </fieldset>
+      <span>Don&apos;t have an account? <Link href='register' className="text-sky-500 hover:underline">Create account!</Link></span>
     </form>
   );
 };
