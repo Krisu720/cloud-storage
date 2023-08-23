@@ -17,7 +17,6 @@ const PhotosSection: FC<PhotosSectionProps> = ({ session,photos }) => {
  
   const [selected, setSelected] = useState<Photos | null>(null);
 
-  console.log(session)
 
   return (
     <>

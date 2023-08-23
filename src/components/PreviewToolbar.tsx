@@ -1,6 +1,6 @@
 import { FC, ReactNode, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Download, Loader2, Share2, Trash2 } from "lucide-react";
+import { ArrowLeft, Copy, Download, Loader2, Share2, Trash2 } from "lucide-react";
 import { Photos } from "@prisma/client";
 import Tooltip from "./ui/Tooltip";
 import { deletePhoto } from "@/lib/apiCalls";
@@ -24,6 +24,12 @@ const PreviewToolbar: FC<PreviewToolbarProps> = ({
 
   const { data } = useSession();
   const {toast} = useToast()
+
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(selected.url)
+    toast({title: "Copied url to clipboard."})
+  }
 
   const handleDelete = async (uuid: string) => {
     if (data?.user) {
@@ -66,6 +72,12 @@ const PreviewToolbar: FC<PreviewToolbarProps> = ({
         <ArrowLeft className="text-white" />
       </ToolbarButton>
       <div className="flex gap-2">
+        <ToolbarButton
+          tooltipTitle="Copy image source link"
+          onClick={() => handleCopy()}
+        >
+        <Copy className="text-white" />
+        </ToolbarButton>
         <ToolbarButton
           tooltipTitle="Delete"
           onClick={() => handleDelete(selected.uuid)}
