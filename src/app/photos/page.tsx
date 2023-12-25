@@ -41,6 +41,8 @@ const Photos = async ({}) => {
   const info = await getUserInfo(userId);
   const photos = await getUserPhotos(userId);
 
+  console.log(photos)
+
   if (session?.user) {
     return (
       <div className="">
