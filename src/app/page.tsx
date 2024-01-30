@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex items-center justify-center ">
+    <div className="flex items-center justify-center">
       <div className=" md:mt-28 relative max-w-6xl w-full h-[35rem] flex flex-col items-center justify-center overflow-hidden ">
         <Image
           src="/Sprinkle.svg"
@@ -18,7 +18,7 @@ export default function Home() {
         <div className="absolute h-[25rem] w-[25rem] rounded-full gradient opacity-25 select-none top-12 right-24" />
         <div className="absolute h-[25rem] w-[25rem] rounded-full gradient opacity-25 select-none top-24 left-24" />
         <div className="absolute h-[25rem] w-[25rem] rounded-full gradient opacity-25 select-none bottom-12 right-80" />
-        <div className="relative z-10 max-w-md w-full flex flex-col items-center">
+        <div className="relative z-10 max-w-md w-full flex flex-col items-center px-2">
           <div className="flex gap-1 items-center my-4">
             <Heading size="title" weight="semibold" className="md:text-6xl text-4xl">
               cloud<span className="text-sky-500">storage</span>

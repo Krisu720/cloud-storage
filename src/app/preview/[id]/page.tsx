@@ -4,7 +4,7 @@ import QRCode from "react-qr-code";
 
 const page = ({ params }: { params: { id: string } }) => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col px-2">
       <div className="flex justify-center mt-6">
         <div className="relative md:h-[40rem] min-h-[30rem] w-full">
           <Image

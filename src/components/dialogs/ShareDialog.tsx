@@ -43,7 +43,8 @@ const ShareDialog: FC<ShareDialogProps> = ({
       setLoading(true);
       const res = await setPublicPhoto(session.data.user.userId, selected.uuid);
       router.refresh()
-      setSelected({ ...res });
+      console.log("res",res)
+      setSelected(res);
       setLoading(false);
     }
     toast({title: "This photo is public now."})
@@ -58,7 +59,7 @@ const ShareDialog: FC<ShareDialogProps> = ({
       );
       console.log(res);
       router.refresh()
-      setSelected({ ...res });
+      setSelected(res);
       setLoading(false);
     }
     toast({title: "This photo is not public anymore."})

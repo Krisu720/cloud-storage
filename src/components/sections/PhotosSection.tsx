@@ -7,20 +7,22 @@ import Image from "next/image";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Session } from "next-auth";
+import BottomPhotoPreview from "../BottomPhotoPreview";
 
 interface PhotosSectionProps {
   session: Session;
-  photos: Photos[]
+  photos: Photos[];
 }
 
-const PhotosSection: FC<PhotosSectionProps> = ({ session,photos }) => {
- 
+const PhotosSection: FC<PhotosSectionProps> = ({ session, photos }) => {
   const [selected, setSelected] = useState<Photos | null>(null);
 
 
+  console.log(selected)
   return (
     <>
       <PhotoPreview
+        photos={photos}
         selected={selected}
         setSelected={setSelected}
       />

@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Copy, Download, Loader2, Share2, Trash2 } from "lucide-react";
 import { Photos } from "@prisma/client";
@@ -21,6 +21,7 @@ const PreviewToolbar: FC<PreviewToolbarProps> = ({
   const router = useRouter()
   const [deleteLoader, setDeleteLoader] = useState<boolean>(false);
   const [downloadLoader, setDownloadLoader] = useState<boolean>(false);
+
 
   const { data } = useSession();
   const {toast} = useToast()
@@ -64,19 +65,22 @@ const PreviewToolbar: FC<PreviewToolbarProps> = ({
   return (
     <motion.div
       initial={{ opacity: 0, y: -150 }}
-      animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }}
+      animate={{ opacity: 1, y: 0, transition: { type:"tween" } }}
       exit={{ opacity: 0, y: -150 }}
-      className="fixed top-10 left-10 right-10 z-30 flex justify-between bg-gray-500/60 p-1 rounded-full"
+      
+      className="fixed top-10 left-10 right-10 z-30 gap-1 flex justify-between p-1 rounded-full "
     >
+      <div className="bg-black/50 rounded-full">
       <ToolbarButton onClick={() => setSelected(null)}>
         <ArrowLeft className="text-white" />
       </ToolbarButton>
-      <div className="flex gap-2">
+      </div>
+      <div className="flex gap-2 rounded-full bg-black/50">
         <ToolbarButton
           tooltipTitle="Copy image source link"
           onClick={() => handleCopy()}
         >
-        <Copy className="text-white" />
+        <Copy className="text-white " />
         </ToolbarButton>
         <ToolbarButton
           tooltipTitle="Delete"

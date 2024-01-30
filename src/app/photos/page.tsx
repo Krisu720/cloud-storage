@@ -35,17 +35,20 @@ const getUserInfo = async (userId: string) => {
   };
 };
 
+const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 const Photos = async ({}) => {
+  await sleep(300)
   const session = await getServerSession(authConfig);
   const userId = session ? session.user.userId : "";
   const info = await getUserInfo(userId);
   const photos = await getUserPhotos(userId);
 
-  console.log(photos)
-
   if (session?.user) {
     return (
-      <div className="">
+      <div className="px-2 md:px-0">
         <Banner info={info} />
         <PhotosSection session={session} photos={photos} />
       </div>

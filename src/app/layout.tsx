@@ -23,11 +23,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Providers className={inter.className}>
-            <div className="dark:bg-neutral-900 min-h-screen">
-              <Container>
+            <div className="min-h-screen container mx-auto">
+              {/* <Container> */}
                 <Navbar />
                 {children}
-              </Container>
+              {/* </Container> */}
             </div>
             <Footer />
           </Providers>
