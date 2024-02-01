@@ -67,6 +67,8 @@ const BottomPhotoPreview: FC<BottomPhotoPreviewProps> = ({
                     className="object-cover"
                     src={item.url}
                     alt={item.uuid}
+                    quality={50}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     fill
                   />
               </motion.button>
