@@ -107,8 +107,8 @@ const PhotoPreview: FC<PhotoPreviewProps> = ({
                   </motion.button>
                   <div className="h-full w-11/12 overflow-hidden">
                     <motion.div
-                      initial={{ x: -slide * 100 + "%" }}
-                      animate={{ x: -slide * 100 + "%",transition:{duration:0.3,ease:[0.6, 0.01, -0.05, 0.95]} }}
+                      // initial={{ x: -slide * 100 + "%" }}
+                      // animate={{ x: -slide * 100 + "%",transition:{duration:0.3,ease:[0.6, 0.01, -0.05, 0.95]} }}
                       exit={{ opacity: 0,y:30 }}
                       className="flex h-full w-full"
                     >
