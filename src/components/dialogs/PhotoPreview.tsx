@@ -24,10 +24,9 @@ const PhotoPreview: FC<PhotoPreviewProps> = ({
   const [open, setOpen] = useState<boolean>(false);
   const [slide, setSlide] = useState<number>(0);
 
-  let prev:Photos | null = null;
 
   useEffect(() => {
-    if (selected && selected !== prev) {
+    if (selected) {
       setOpen(true);
       setSlide(photos.indexOf(selected));
     } else {
@@ -108,12 +107,12 @@ const PhotoPreview: FC<PhotoPreviewProps> = ({
                   </motion.button>
                   <div className="h-full w-11/12 overflow-hidden">
                     <motion.div
-                      initial={{ x: -slide * 100 + "%" }}
-                      animate={{ x: -slide * 100 + "%",transition:{duration:0.3,ease:[0.6, 0.01, -0.05, 0.95]} }}
+                      // initial={{ x: -slide * 100 + "%" }}
+                      // animate={{ x: -slide * 100 + "%",transition:{duration:0.3,ease:[0.6, 0.01, -0.05, 0.95]} }}
                       exit={{ opacity: 0,y:30 }}
                       className="flex h-full w-full"
                     >
-                      {photos.map((item) => (
+                      {photos.slice(slide,slide+3).map((item) => (
                         <div key={item.uuid} className="h-full w-full shrink-0 relative">
                           <Image
                             className="object-contain"

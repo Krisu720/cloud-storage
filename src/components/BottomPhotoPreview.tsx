@@ -49,7 +49,7 @@ const BottomPhotoPreview: FC<BottomPhotoPreviewProps> = ({
           >
             {photos.map((item) => (
               <motion.button
-              key={item.uuid}
+                key={item.uuid}
                 animate={{
                   width:
                     selected && selected?.uuid === item.uuid
@@ -63,12 +63,12 @@ const BottomPhotoPreview: FC<BottomPhotoPreviewProps> = ({
                 className="h-full shrink-0 relative hover:opacity-80 transition-opacity"
                 onClick={() => setSelected(item)}
               >
-                <Image
-                  className="object-cover"
-                  src={item.url}
-                  alt={item.uuid}
-                  fill
-                />
+                  <Image
+                    className="object-cover"
+                    src={item.url}
+                    alt={item.uuid}
+                    fill
+                  />
               </motion.button>
             ))}
           </motion.div>
