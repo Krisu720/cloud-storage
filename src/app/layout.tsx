@@ -1,10 +1,9 @@
-import Navbar from "@/components/sections/Navbar";
-import "./globals.css";
+import Navbar from "~/components/sections/Navbar";
+import "~/styles/globals.css";
 import { Inter } from "next/font/google";
-import Providers from "@/components/wrappers/Providers";
-import Container from "@/components/wrappers/Container";
-import Footer from "@/components/sections/Footer";
-import { ThemeProvider } from "@/components/wrappers/ThemeProvider";
+import Providers from "~/components/wrappers/Providers";
+import Footer from "~/components/sections/Footer";
+import { ThemeProvider } from "~/components/wrappers/ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,12 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+     
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Providers className={inter.className}>
-            <div className="min-h-screen container mx-auto">
+          <Providers className={""}>
+            <div className="min-h-screen  sm:container mx-auto">
               {/* <Container> */}
-                <Navbar />
-                {children}
+              <Navbar />
+              {children}
               {/* </Container> */}
             </div>
             <Footer />

@@ -1,3 +1,6 @@
+await import("./src/env.js");
+
+import withPlaiceholder from "@plaiceholder/next";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -16,9 +19,6 @@ const nextConfig = {
         }
       ],
   },
-  experimental: {
-    serverActions: true
-  }
 };
 
-module.exports = nextConfig;
+export default withPlaiceholder(nextConfig);

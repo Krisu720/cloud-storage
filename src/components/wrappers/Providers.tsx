@@ -1,7 +1,8 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
-import Toaster from "../ui/Toaster";
+import { Toaster } from "sonner";
+import { TRPCReactProvider } from "~/trpc/react";
+import SessionProvider from "./Session";
 
 const Providers = ({
   children,
@@ -11,10 +12,12 @@ const Providers = ({
   className: string;
 }) => {
   return (
-    <SessionProvider>
-      <Toaster />
-      {children}
-    </SessionProvider>
+    <TRPCReactProvider>
+      <SessionProvider>
+        <Toaster />
+        {children}
+      </SessionProvider>
+    </TRPCReactProvider>
   );
 };
 

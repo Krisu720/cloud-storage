@@ -1,65 +1,61 @@
 "use client";
 
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, useRef, useCallback } from "react";
 import { AnimatePresence, motion, useTransform } from "framer-motion";
 import { Photos } from "@prisma/client";
 import PreviewToolbar from "../PreviewToolbar";
 import Image from "next/image";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Button } from "../ui/Button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import BottomPhotoPreview from "../BottomPhotoPreview";
+import BottomPhotoSection from "../BottomPhotoSection";
+import useRects from "~/hooks/useRects";
+import useBreakPoint from "~/hooks/useBreakPoints";
+import { useSelected } from "~/hooks/selectedStore";
+import ArrowControls from "../ArrowControls";
 
 interface PhotoPreviewProps {
-  selected: Photos | null;
   photos: Photos[];
-  setSelected: React.Dispatch<React.SetStateAction<Photos | null>>;
 }
 
-const PhotoPreview: FC<PhotoPreviewProps> = ({
-  selected,
-  setSelected,
-  photos,
-}) => {
+const PhotoPreview: FC<PhotoPreviewProps> = ({ photos }) => {
   const [open, setOpen] = useState<boolean>(false);
-  const [slide, setSlide] = useState<number>(0);
+  const [widthBehind, setWidthBehind] = useState<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [rects,loadRects] = useRects({ ref: containerRef });
+  const breakpoint = useBreakPoint();
+  const { selected, setSelected } = useSelected();
 
+  console.log("selected",selected)
+
+  // const slide = selected ? photos.indexOf(selected) : 0;
+  const slide = selected ? photos.findIndex((item)=>item.uuid === selected.uuid) : 0;
+
+  useEffect(() => {
+    if (selected && rects) setWidthBehind(slide * rects.width);
+  }, [slide, rects?.width,open]);
+
+  useEffect(()=>{loadRects()},[open])
 
   useEffect(() => {
     if (selected) {
       setOpen(true);
-      setSlide(photos.indexOf(selected));
-    } else {
+    } else if (!selected) {
       setOpen(false);
     }
   }, [selected]);
 
-  useEffect(() => {
-    if (open) setSelected(photos[slide]);
-  }, [slide]);
-
-  // useEffect(() => {
-  //   window.addEventListener("keydown", (e) => {
-  //     if (e.key === "ArrowLeft") handleSlide("left");
-  //     if (e.key === "ArrowRight") handleSlide("right");
-  //   });
-  // }, []);
-
-  const handleSlide = (direction: "right" | "left") => {
+  const handleSlide = useCallback((direction: "right" | "left") => {
     if (direction === "right") {
-      if (slide === photos.length - 1) {
-        setSlide(0);
-      } else {
-        setSlide(slide + 1);
+      if (slide !== photos.length - 1) {
+        const nextPhoto = photos.at(slide+1);
+        setSelected(prev=>nextPhoto ? nextPhoto :prev)
       }
     } else if (direction === "left") {
-      if (slide === 0) {
-        setSlide(photos.length - 1);
-      } else {
-        setSlide(slide - 1);
+      if (slide !== 0) {
+        const prevPhoto = photos.at(slide-1);
+        setSelected(prev=>prevPhoto ? prevPhoto :prev)
       }
     }
-  };
+  },[slide,photos]);
 
   return (
     <Dialog.Root onOpenChange={setOpen} open={open}>
@@ -74,52 +70,72 @@ const PhotoPreview: FC<PhotoPreviewProps> = ({
                 exit={{ opacity: 0 }}
                 className="relative z-20"
               >
-                <PreviewToolbar setSelected={setSelected} selected={selected} />
-                {/* <BottomPhotoPreview
-                  setSelected={setSelected}
-                  selected={selected}
-                  photos={photos}
-                /> */}
+                <PreviewToolbar />
+                <BottomPhotoSection photos={photos} />
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="fixed inset-0 bg-black/80 flex justify-center items-center z-20 overflow-y-auto"
                 >
-                  <motion.button
-                    initial={{ x: -100 }}
-                    animate={{ x: 0 }}
-                    exit={{ x: -100 }}
-                    transition={{ type: "tween" }}
-                    className="absolute top-1/2 -translate-y-1/2 left-5 z-30 p-3 rounded-full hover:bg-gray-100/10 text-white"
-                    onClick={() => handleSlide("left")}
+                  <ArrowControls handleSlide={handleSlide}/>
+                  <div
+                    ref={containerRef}
+                    // onLoad={()=>loadRects()}
+                    className="h-full w-11/12 overflow-hidden"
                   >
-                    <ChevronLeft />
-                  </motion.button>
-                  <motion.button
-                    initial={{ x: 100 }}
-                    animate={{ x: 0 }}
-                    exit={{ x: 100 }}
-                    transition={{ type: "tween" }}
-                    className="absolute top-1/2 -translate-y-1/2 right-5 z-30 p-3 rounded-full hover:bg-gray-100/10 text-white"
-                    onClick={() => handleSlide("right")}
-                  >
-                    <ChevronRight />
-                  </motion.button>
-                  <div className="h-full w-11/12 overflow-hidden">
                     <motion.div
+                      key={JSON.stringify(rects)}
+                      transition={{
+                        duration: 0.2,
+                        ease: [0.6, 0.01, 0.05, 0.95],
+                      }}
                       // initial={{ x: -slide * 100 + "%" }}
-                      // animate={{ x: -slide * 100 + "%",transition:{duration:0.3,ease:[0.6, 0.01, -0.05, 0.95]} }}
-                      exit={{ opacity: 0,y:30 }}
+                      // animate={{ x: -slide * 100 + "%", }}
+                      initial={{ x: -widthBehind }}
+                      animate={{ x: -widthBehind }}
+                      dragConstraints={
+                        typeof widthBehind === "number"
+                          ? { right: -widthBehind, left: -widthBehind }
+                          : undefined
+                      }
+                      drag="x"
+                      // dragMomentum={true}
+                      dragElastic={1}
+                      onDragEnd={(e, i) => {
+                        if (
+                          i.velocity.x > 500 ||
+                          (breakpoint === "sm"
+                            ? i.offset.x > 150
+                            : i.offset.x > 350)
+                        ) {
+                          handleSlide("left");
+                        }
+                        if (
+                          i.velocity.x < -500 ||
+                          (breakpoint === "sm"
+                            ? i.offset.x < -150
+                            : i.offset.x < -350)
+                        ) {
+                          handleSlide("right");
+                        }
+                      }}
+                      exit={{ opacity: 0, y: 30 }}
                       className="flex h-full w-full"
                     >
-                      {photos.slice(slide,slide+3).map((item) => (
-                        <div key={item.uuid} className="h-full w-full shrink-0 relative">
-                          <Image
-                            className="object-contain"
-                            src={item.url}
-                            alt={item.uuid}
-                            fill
-                          />
+                      {photos.map((item, index) => (
+                        <div
+                          key={item.uuid}
+                          className="h-full w-full shrink-0 relative"
+                        >
+                          {index <= slide + 2 && index >= slide - 2 && (
+                            <Image
+                              draggable="false"
+                              className="object-contain"
+                              src={item.url}
+                              alt={item.uuid}
+                              fill
+                            />
+                          )}
                         </div>
                       ))}
                     </motion.div>

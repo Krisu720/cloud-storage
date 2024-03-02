@@ -1,162 +1,157 @@
 "use client";
 
 import { FC, useEffect, useState } from "react";
-import Heading from "../ui/Heading";
-import Dialog from "../ui/Dialog";
-import { Input } from "../ui/Input";
-import { AlertTriangle, Check, Clipboard, Loader2, X } from "lucide-react";
-import { Button } from "../ui/Button";
+import { Input } from "../ui/input";
+import {
+  AlertTriangle,
+  BadgeAlert,
+  Check,
+  Clipboard,
+  Loader2,
+  X,
+} from "lucide-react";
+import { Button } from "../ui/button";
 import { AnimatePresence, Variants, motion } from "framer-motion";
-import { Photos } from "@prisma/client";
-import { setPublicPhoto, removePublicPhoto } from "@/lib/apiCalls";
-import { useSession } from "next-auth/react";
-import {useRouter} from 'next/navigation'
-import { useToast } from "@/hooks/toastStore";
-interface ShareDialogProps {
-  selected: Photos;
-  setSelected: React.Dispatch<React.SetStateAction<Photos | null>>;
-}
 
-const ShareDialog: FC<ShareDialogProps> = ({
-  selected,
-  setSelected,
-}) => {
-  const router = useRouter()
-  const session = useSession();
-  const {toast} = useToast()
+import { useRouter } from "next/navigation";
+import { useSelected } from "~/hooks/selectedStore";
+import { toast } from "sonner";
+import { DialogDescription, DialogHeader } from "../ui/dialog";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { api } from "~/trpc/react";
+import { useSession } from "~/hooks/useSession";
+
+const ShareDialog: FC = ({}) => {
+  const publicPhoto = api.photos.setPublicPhoto.useMutation();
+  const privatePhoto = api.photos.removePublicPhoto.useMutation();
+
+  const { selected, setSelected } = useSelected();
+  const router = useRouter();
+  const {user} = useSession();
   const [status, setStatus] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+
+  const loading =
+    publicPhoto.isLoading || privatePhoto.isLoading ? true : false;
 
   const copyText = () => {
-    if (selected.publicId) {
+    if (selected?.publicId) {
       navigator.clipboard.writeText(
         `${window.location.origin}/preview/${selected.publicId}`
       );
       setCopied(true);
     }
-    toast({title: "Copied to clipboard."})
+    toast("Copied to clipboard.");
   };
 
   const setPublic = async () => {
-    if (session.data?.user.userId) {
-      setLoading(true);
-      const res = await setPublicPhoto(session.data.user.userId, selected.uuid);
-      router.refresh()
-      console.log("res",res)
-      setSelected(res);
-      setLoading(false);
-    }
-    toast({title: "This photo is public now."})
+    try {
+      if (user?.id && selected) {
+        await publicPhoto.mutateAsync(selected.uuid, {
+          onError: (err) => toast.error(err.message),
+          onSuccess: (res) => {
+            setSelected(res);
+            router.refresh();
+            toast("This photo is public now.");
+          },
+        });
+      }
+    } catch (error) {}
   };
 
   const removePublic = async () => {
-    if (session.data?.user.userId) {
-      setLoading(true);
-      const res = await removePublicPhoto(
-        session.data.user.userId,
-        selected.uuid
-      );
-      console.log(res);
-      router.refresh()
-      setSelected(res);
-      setLoading(false);
+    if (user?.id && selected) {
+      await privatePhoto.mutateAsync(selected.uuid, {
+        onError: (err) => toast.error(err.message),
+        onSuccess: (res) => {
+          setSelected(res);
+          router.refresh();
+          toast("This photo is not public anymore.");
+        },
+      });
     }
-    toast({title: "This photo is not public anymore."})
   };
 
   useEffect(() => {
-    setStatus(selected.publicId);
+    setStatus(selected?.publicId ?? null);
   }, [selected]);
 
   return (
     <>
-      <div className="flex justify-between items-center">
-        <div className="flex gap-2 w-full items-center">
-          <Heading size="xl" weight="bold">
-            Share
-          </Heading>
-          {status ? (
-            <Button
-              size="small"
-              variant="danger"
-              onClick={() => removePublic()}
-              className="flex items-center gap-2"
-            >
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              Stop sharing photo
-            </Button>
-          ) : (
-            <Button
-              size="small"
-              variant="success"
-              onClick={() => setPublic()}
-              className="flex items-center gap-2"
-            >
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              Share photo
-            </Button>
-          )}
-        </div>
-        <Dialog.Close className="p-2  hover:bg-black/20 rounded-full transition-colors">
-          <X className="dark:text-white" />
-        </Dialog.Close>
-      </div>
-      <div className="mt-2">
+      <DialogHeader>Share</DialogHeader>
+      <DialogDescription>
+        Share your photo to someone using external link.
+      </DialogDescription>
+
+      <Alert variant={status ? "default" : "destructive"}>
+        <AlertTitle className="flex gap-0.5 items-center">
+          <BadgeAlert className="h-5 w-5 flex-shrink-0" />
+          Privacy Alert
+        </AlertTitle>
         {status ? (
-          <Heading className="text-yellow-600 dark:text-yellow-600 flex gap-2 items-center">
-            <AlertTriangle className="h-6 w-6 flex-shrink-0" />
+          <AlertDescription>
             Everyone who have the link can access this photo.
-          </Heading>
+          </AlertDescription>
         ) : (
-          <>
-            <Heading variant="secondary" size="lg" weight="semibold">
-              Share your photo to someone using external link.
-            </Heading>
-            <div className="flex flex-col items-center justify-center text-center mt-6">
-              <AlertTriangle className="text-red-500 dark:text-red-600 h-8 w-8" />
-              <Heading className="text-red-500 dark:text-red-600 flex gap-3 items-center">
-                If you share photo everyone who has unique link<br className="hidden sm:block "/> can
-                access shared photo.
-              </Heading>
-            </div>
-          </>
+          <AlertDescription>
+            If you share photo everyone who has unique link can access shared
+            photo.
+          </AlertDescription>
         )}
-      </div>
+      </Alert>
       {status ? (
-        <div className="flex mt-4">
-          <Input
-            className="w-full items-center select-none text-gray-600"
-            value={`${window.location.origin}/preview/${
-              selected.publicId ? selected.publicId : undefined
-            }`}
-            readOnly
-          />
-          <button
-            className="relative inline-flex justify-center items-center w-12 border-gray-300/40 dark:text-white p-2 ml-2 border-2 rounded hover:border-gray-500 dark:hover:border-white transition-colors"
-            onClick={() => copyText()}
+        <>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() => removePublic()}
+            className="flex items-center gap-2"
           >
-            <AnimatePresence initial={false}>
-              {copied && (
-                <motion.div {...copyAnimation} className="absolute">
-                  <Check />
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <AnimatePresence
-              initial={false}
-              onExitComplete={() => setTimeout(() => setCopied(false), 1500)}
+            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+            Stop sharing photo
+          </Button>
+          <div className="flex mt-4">
+            <Input
+              className="w-full items-center select-none text-gray-600"
+              value={`${window.location.origin}/preview/${
+                selected?.publicId ?? undefined
+              }`}
+              readOnly
+            />
+            <button
+              className="relative inline-flex justify-center items-center w-12 border-gray-300/40 dark:text-white p-2 ml-2 border-2 rounded hover:border-gray-500 dark:hover:border-white transition-colors"
+              onClick={() => copyText()}
             >
-              {!copied && (
-                <motion.div {...copyAnimation} className="absolute">
-                  <Clipboard />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </button>
-        </div>
+              <AnimatePresence initial={false}>
+                {copied && (
+                  <motion.div {...copyAnimation} className="absolute">
+                    <Check />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <AnimatePresence
+                initial={false}
+                onExitComplete={() => setTimeout(() => setCopied(false), 1500)}
+              >
+                {!copied && (
+                  <motion.div {...copyAnimation} className="absolute">
+                    <Clipboard />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </button>
+          </div>
+        </>
       ) : (
-        <></>
+        <Button
+          size="sm"
+          variant="default"
+          onClick={() => setPublic()}
+          className="flex items-center gap-2"
+        >
+          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+          Share photo
+        </Button>
       )}
     </>
   );

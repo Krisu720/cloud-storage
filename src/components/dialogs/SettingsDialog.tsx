@@ -1,66 +1,88 @@
 "use client";
 
-import { Dispatch, FC, SetStateAction } from "react";
-import { X } from "lucide-react";
-import Heading from "../ui/Heading";
-import Dialog from "../ui/Dialog";
-import { Session } from "next-auth";
-import Image from "next/image";
 import ImagesDialog from "./ImagesDialog";
 import ChangePasswordDialog from "./ChangePasswordDialog";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../ui/accordion";
+import { Github, Laptop2 } from "lucide-react";
+import { Badge } from "../ui/badge";
+import Image from "next/image";
+import { Button } from "../ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+} from "../ui/dialog";
+import { User } from "lucia/dist/core";
 
 interface SettingsDialogProps {
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-  session: Session;
+  user: User;
 }
 
-const SettingsDialog: FC<SettingsDialogProps> = ({
-  open,
-  setOpen,
-  session,
-}) => {
+const SettingsDialog: React.FC<SettingsDialogProps> = ({ user }) => {
   return (
-    <Dialog open={open} setOpen={setOpen}>
-      <Dialog.Menu>
-        <div className="relative">
-          <Dialog.Close className="p-2 hover:bg-black/20 rounded-full transition-colors absolute top-2 right-2">
-            <X className="dark:text-white" />
-          </Dialog.Close>
-          <div className="flex flex-col gap-4">
-            <Heading size="xl" weight="bold">
-              Account
-            </Heading>
-            <div className="flex gap-2 items-center mt-2">
-              <div
-                className={`w-14 h-14  cursor-pointer relative rounded-full overflow-hidden ${
-                  session.user.image ? "" : "dark:bg-white bg-black "
-                }`}
-              >
-                {session.user.image && (
-                  <Image
-                    src={session.user.image}
-                    className="object-cover"
-                    fill
-                    alt="avatar"
-                  />
-                )}
-                {session.user.email && (
-                  <span className="flex items-center justify-center h-full w-full md:text-2xl text-lg uppercase text-white dark:text-black">
-                    {session.user.email[0]}
-                  </span>
-                )}
-              </div>
-              <Heading size="lg">{session.user.email} </Heading>
+    <>
+      <DialogHeader>Account settings</DialogHeader>
+      <div className="flex flex-col gap-4">
+        <h1>Profile</h1>
+        <div className="flex gap-2 items-center mt-2">
+          <Avatar>
+            <AvatarImage src={user.image ?? undefined} />
+            <AvatarFallback>{user.email![0]}</AvatarFallback>
+          </Avatar>
+          <h1>{user.email} </h1>
+        </div>
+        <div className="flex gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Change password</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <ChangePasswordDialog user={user} />
+            </DialogContent>
+          </Dialog>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Change image</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <ImagesDialog user={user} />
+            </DialogContent>
+          </Dialog>
+        </div>
+        <h1>Connected accounts</h1>
+        <div>
+          {user.githubId ? (
+            <div className="flex gap-2">
+              <Github /> <h1>{user.username}</h1>
             </div>
-            <div className="flex gap-2 mt-4">
-              <ChangePasswordDialog session={session} />
-              <ImagesDialog session={session} />
+          ) : (<h1 className="text-muted-foreground text-xs">No accounts connected</h1>)}
+        </div>
+        {/* <h1>Active devices</h1>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-secondary rounded p-2 flex">
+            <Laptop2 className="h-10 w-10" />
+            <div className="ml-2">
+              <h1>Windows</h1>
+              <div className="my-0.5">
+                <h1 className="text-xs">Chrome 121.0.0.0</h1>
+                <h1 className="text-xs">Dąbrowa Górnicza, PL</h1>
+                <h1 className="text-xs">19.02.2024 @ 00:18:29</h1>
+              </div>
+              <Badge>Current device</Badge>
             </div>
           </div>
-        </div>
-      </Dialog.Menu>
-    </Dialog>
+        </div> */}
+        <div className="flex gap-2 mt-4"></div>
+      </div>
+    </>
   );
 };
 

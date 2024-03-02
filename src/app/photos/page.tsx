@@ -1,61 +1,33 @@
-import Banner from "@/components/sections/Banner";
-import PhotosSection from "@/components/sections/PhotosSection";
-import authConfig from "@/lib/authConfig";
-import { prisma } from "@/utils/prismaSingleton";
-import { getServerSession } from "next-auth";
+import Banner from "~/components/sections/Banner";
+import PhotosSection from "~/components/sections/PhotosSection";
 import { redirect } from "next/navigation";
-const getUserPhotos = async (userId: string) => {
-  "use server";
-  const res = await prisma.photos.findMany({ where: { userId } });
-  return res;
-};
+import { sortPhotos } from "~/lib/helpers";
+import { api } from "~/trpc/server";
 
-const getUserInfo = async (userId: string) => {
-  "use server";
-  const res = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { photos: { orderBy: { createdAt: "asc" } } },
-  });
-
-  if (!res) throw Error("Personal info not found.");
-
-  let size: number = 0;
-  let counter: number = 0;
-  let sharedCounter: number = 0;
-  res.photos.map((item) => {
-    size = item.size + size;
-    item.publicId && sharedCounter++;
-    counter++;
-  });
-
-  return {
-    size: size / 1024 / 1024,
-    number: counter,
-    sharedNumber: sharedCounter,
-  };
-};
-
-const sleep = (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-};
 
 const Photos = async ({}) => {
-  await sleep(300)
-  const session = await getServerSession(authConfig);
-  const userId = session ? session.user.userId : "";
-  const info = await getUserInfo(userId);
-  const photos = await getUserPhotos(userId);
+  try {
 
-  if (session?.user) {
+  const photos = await api.photos.getPhotos.query();
+  const info = await api.auth.getUserInfo.query()
+  if (!photos) redirect("/login");
+
+  const sortedPhotos = sortPhotos(photos.photos);
+  
+  if (photos) {
     return (
-      <div className="px-2 md:px-0">
+      <div className="">
         <Banner info={info} />
-        <PhotosSection session={session} photos={photos} />
+        <PhotosSection photos={sortedPhotos} />
       </div>
     );
   } else {
     redirect("/login");
   }
+ } catch(err){
+  redirect("/login")
+ }
+
 };
 
 export default Photos;

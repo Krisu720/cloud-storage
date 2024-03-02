@@ -20,6 +20,7 @@ model Photos {
   userId    String
   url       String   @unique
   size      Int
+  name      String?
   publicId  String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -29,8 +30,18 @@ model Photos {
 model User {
   id       String   @unique @default(uuid())
   email    String   @unique @db.VarChar(255)
-  password String
+  password String?
   image    String?
+  githubId Int?
+  username String?
   plan     Plan     @default(MB500)
   photos   Photos[]
+  sessions Session[]
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 }

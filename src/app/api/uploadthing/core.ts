@@ -1,27 +1,27 @@
-import { prisma } from "@/utils/prismaSingleton";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { getToken } from "next-auth/jwt";
+import { validateSession } from "~/server/auth";
+import { db } from "~/server/db";
+
 const f = createUploadthing();
 
 export const ourFileRouter = {
-  imageUploader: f({ image: { maxFileSize: "16MB", maxFileCount: 5 } })
+  imageUploader: f({ image: { maxFileSize: "16MB", maxFileCount: 10 } })
     .middleware(async ({ req }) => {
-      const token = await getToken({ req });
-      if (token) {
-        return { userId: token.userId };
+      const { user } = await validateSession();
+      if (user) {
+        return { userId: user.id };
       }
       throw new Error("Token is not provided");
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      await prisma.photos.create({
+      await db.photos.create({
         data: {
           url: file.url,
+          name: file.name,
           size: file.size,
           userId: metadata.userId,
         },
       });
-      console.log("Upload complete for userId:", metadata.userId);
-      console.log("file url", file.url);
     }),
 } satisfies FileRouter;
 

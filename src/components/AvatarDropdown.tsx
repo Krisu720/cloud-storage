@@ -1,70 +1,90 @@
 "use client";
 
-import { LogOut, Wrench, ImageIcon } from "lucide-react";
-import Image from "next/image";
-import Dropdown from "./ui/Dropdown";
-import { signOut } from "next-auth/react";
+import { LogOut, Wrench, ImageIcon, Upload } from "lucide-react";
 import { useState } from "react";
 import SettingsDialog from "./dialogs/SettingsDialog";
 import Link from "next/link";
-import { Session } from "next-auth";
-import Heading from "./ui/Heading";
 
-const AvatarDropdown = ({ session }: { session: Session }) => {
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+
+import UploadDialog from "./dialogs/UploadDialog";
+import { User } from "lucia/dist/core";
+import { Dialog, DialogContent } from "./ui/dialog";
+import { useRouter } from "next/navigation";
+import { api } from "~/trpc/react";
+import { toast } from "sonner";
+import { useSession } from "~/hooks/useSession";
+
+const AvatarDropdown = ({ user }: { user: User }) => {
+  const [settings, setSettings] = useState<boolean>(false);
+  const [upload, setUpload] = useState<boolean>(false);
+  const {setUser} = useSession();
+  const auth = api.auth.lougout.useMutation();
+  const router = useRouter();
+  const signOut = async () => {
+    try {
+      await auth.mutateAsync(undefined, {
+        onSuccess: () => {
+          toast("Successfully logged out");
+          setUser(null);
+          router.refresh();
+          router.push("/login");
+        },
+        onError: ({ message }) => {
+          toast.error(message, {
+            style: { backgroundColor: "red", color: "white" },
+          });
+        },
+      });
+    } catch (err) {}
+  };
+
   return (
     <>
-      <SettingsDialog
-        open={openDialog}
-        setOpen={setOpenDialog}
-        session={session}
-      />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Avatar>
+            <AvatarImage src={user.image ?? undefined} />
+            <AvatarFallback>{user.email[0]}</AvatarFallback>
+          </Avatar>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem asChild>
+            <Link href="/photos">
+              <ImageIcon className="mr-2" />
+              My photos
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setUpload(true)}>
+            <Upload className="mr-2" /> Upload
+          </DropdownMenuItem>
 
-      <Dropdown>
-        <Dropdown.Button>
-          <div
-            className={`md:h-12 md:w-12 w-8 h-8  cursor-pointer relative rounded-full overflow-hidden ${
-              session.user.image ? "" : "dark:bg-white bg-black "
-            }`}
-          >
-            {session.user.image && (
-              <Image
-                src={session.user.image}
-                className="object-cover"
-                fill
-                alt="avatar"
-              />
-            )}
-            {session.user.email && (
-              <Heading className="flex items-center justify-center h-full w-full md:text-2xl text-lg uppercase dark:text-black text-white">
-                {session.user.email[0]}
-              </Heading>
-            )}
-          </div>
-        </Dropdown.Button>
-        <Dropdown.Menu>
-          <Link href="/photos">
-            <Dropdown.Item>
-              <ImageIcon className="dark:text-white" />
-              <Heading >
-                My gallery
-              </Heading>
-            </Dropdown.Item>
-          </Link>
-          <Dropdown.Item onSelect={() => setOpenDialog(true)}>
-            <Wrench className="dark:text-white" />
-            <Heading >
-              Account settings
-            </Heading>
-          </Dropdown.Item>
-          <Dropdown.Item
-            onSelect={() => signOut({ callbackUrl: "/", redirect: true })}
-          >
-            <LogOut className="dark:text-white" />{" "}
-            <Heading >Sign out</Heading>
-          </Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
+          <DropdownMenuItem onSelect={() => setSettings(true)}>
+            <Wrench className="mr-2" />
+            Account settings
+          </DropdownMenuItem>
+
+          <DropdownMenuItem onSelect={() => signOut()}>
+            <LogOut className="mr-2" /> <h1>Sign out</h1>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Dialog open={settings} onOpenChange={setSettings}>
+        <DialogContent>
+          <SettingsDialog user={user} />
+        </DialogContent>
+      </Dialog>
+      <Dialog open={upload} onOpenChange={setUpload}>
+        <DialogContent>
+          <UploadDialog />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

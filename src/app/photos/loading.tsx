@@ -1,5 +1,5 @@
-import { Skeleton } from "@/components/ui/Skeleton";
 import { FC } from "react";
+import { Skeleton } from "~/components/ui/skeleton";
 
 export default function Loading() {
   return (

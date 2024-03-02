@@ -4,8 +4,8 @@ import { Photos } from "@prisma/client";
 import React, { FC } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { cn } from "@/utils/stylingHelper";
-import useBreakPoint from "@/hooks/useBreakPoints";
+import { cn } from "~/lib/utils";
+import useBreakPoint from "~/hooks/useBreakPoints";
 
 interface BottomPhotoPreviewProps {
   selected: Photos | null;
@@ -68,7 +68,7 @@ const BottomPhotoPreview: FC<BottomPhotoPreviewProps> = ({
                     src={item.url}
                     alt={item.uuid}
                     quality={50}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    sizes="(max-width: 768px) 10vw, (max-width: 1200px) 5vw, 3vw"
                     fill
                   />
               </motion.button>
