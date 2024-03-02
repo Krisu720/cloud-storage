@@ -3,6 +3,21 @@ import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
 import { db } from "./db";
 import { cookies } from "next/headers";
 import {GitHub} from 'arctic'
+export interface DatabaseUserAttributes {
+  id:string;
+  email: string;
+  githubId?: string;
+  username?: string;
+  image?: string;
+}
+
+declare module "Lucia" {
+  interface Register {
+    Lucia: typeof auth;
+    DatabaseUserAttributes: DatabaseUserAttributes;
+  }
+}
+
 export const github = new GitHub(process.env.GITHUB_ID!,process.env.GITHUB_SECRET!)
 
 export const auth = new Lucia(new PrismaAdapter(db.session, db.user), {
@@ -43,16 +58,3 @@ export const validateSession = async (): Promise<ValidateSession> => {
   return { session, user };
 };
 
-interface DatabaseUserAttributes {
-  email: string;
-  githubId?: string;
-  username?: string;
-  image?: string;
-}
-
-declare module "Lucia" {
-  interface Register {
-    Lucia: typeof auth;
-    DatabaseUserAttributes: DatabaseUserAttributes;
-  }
-}

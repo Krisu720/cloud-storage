@@ -1,5 +1,5 @@
 import { Photos } from "@prisma/client";
-import { User as LuciaUser} from "lucia/dist/core";
+import { DatabaseUserAttributes } from "./server/auth";
 
 export type SortedPhotos = {
   [year: string]: {
@@ -7,4 +7,4 @@ export type SortedPhotos = {
   };
 };
 
-export type User = LuciaUser
+export type User = DatabaseUserAttributes
