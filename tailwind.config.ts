@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss"
-import plaiceholder from "@plaiceholder/tailwindcss";
 import animate from "tailwindcss-animate";
 const config = {
   darkMode: ["class"],
@@ -84,7 +83,7 @@ const config = {
       },
     },
   },
-  plugins: [animate, plaiceholder],
+  plugins: [animate],
 } satisfies Config
 
 export default config
