@@ -14,7 +14,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 import UploadDialog from "./dialogs/UploadDialog";
-import { User } from "lucia/dist/core";
+import {User} from '~/types'
 import { Dialog, DialogContent } from "./ui/dialog";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";

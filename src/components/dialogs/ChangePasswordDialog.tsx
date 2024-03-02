@@ -10,7 +10,7 @@ import ErrorSpan from "../ErrorSpan";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { Input } from "~/components/ui/input";
-import { User } from "lucia/dist/core";
+import {User} from '~/types'
 import { DialogHeader } from "../ui/dialog";
 import { api } from "~/trpc/react";
 

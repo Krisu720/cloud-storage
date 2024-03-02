@@ -1,5 +1,5 @@
 import { Photos } from "@prisma/client";
-import { SortedPhotos } from "../../types";
+import { SortedPhotos } from "../types";
 
 export function sortPhotos(photos: Photos[]) {
   const sorted: SortedPhotos = {};

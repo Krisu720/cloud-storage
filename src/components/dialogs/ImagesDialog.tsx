@@ -7,7 +7,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { DialogHeader } from "~/components/ui/dialog";
 import { Button, ButtonLoader } from "~/components/ui/button";
-import { User } from "lucia/dist/core";
+import {User} from '~/types'
 import { api } from "~/trpc/react";
 import { ScrollArea } from "../ui/scroll-area";
 interface ImagesDialogProps {

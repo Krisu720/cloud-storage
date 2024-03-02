@@ -3,7 +3,7 @@
 import { FC, useCallback, useState } from "react";
 import PhotoPreview from "~/components/dialogs/PhotoPreview";
 import { AnimatePresence, motion } from "framer-motion";
-import { SortedPhotos } from "../../../types";
+import { SortedPhotos } from "../../types";
 import { format } from "date-fns";
 import { useSelected } from "~/hooks/selectedStore";
 import { Photos } from "@prisma/client";

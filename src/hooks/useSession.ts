@@ -1,4 +1,4 @@
-import { User } from "lucia/dist/core";
+import {User} from '~/types'
 import { create } from "zustand";
 
 type SessionStoreType = {
