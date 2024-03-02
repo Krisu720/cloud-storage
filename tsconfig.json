@@ -11,7 +11,7 @@
     /* Strictness */
     "strict": false,
     "noUncheckedIndexedAccess": true,
-    "checkJs": true,
+    "checkJs": false,
     /* Bundled projects */
     "lib": [
       "dom",
