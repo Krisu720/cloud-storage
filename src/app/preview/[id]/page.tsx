@@ -24,7 +24,7 @@ import { Button, ButtonLoader } from "~/components/ui/button";
 import { api } from "~/trpc/react";
 import { download } from "~/lib/helpers";
 import { toast } from "sonner";
-
+import { useTheme } from "next-themes"
 type Block = {
   label: string;
   value: string | null;
@@ -32,6 +32,7 @@ type Block = {
 };
 
 const page = ({ params }: { params: { id: string } }) => {
+  const {theme} = useTheme()
   const [preview, setPreview] = useState(false);
   const photo = api.photos.getSharedPhoto.useQuery(params.id);
 
@@ -47,8 +48,7 @@ const page = ({ params }: { params: { id: string } }) => {
               draggable="false"
               layoutId="preview"
               sizes="100vw"
-              // src="/watermarknew.png"
-              src={`${location.hostname}/api/public/${params.id}`}
+              src={`/api/public/${params.id}`}
               className="object-contain h-screen w-screen fixed z-50 inset-0"
               alt="preview"
             />
@@ -128,7 +128,7 @@ const page = ({ params }: { params: { id: string } }) => {
               <QRCode
                 className="bg-secondary p-2 rounded-xl  w-full  "
                 size={150}
-                fgColor="white"
+                fgColor={theme === "light" ? "black" : "white" }
                 bgColor="transparent"
                 value={window.location.href}
               />
