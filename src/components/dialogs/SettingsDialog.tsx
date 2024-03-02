@@ -20,7 +20,7 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "../ui/dialog";
-import {User} from '~/types'
+import { User } from "lucia/dist/core";
 
 interface SettingsDialogProps {
   user: User;
