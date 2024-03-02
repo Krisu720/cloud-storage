@@ -48,7 +48,7 @@ const page = ({ params }: { params: { id: string } }) => {
               layoutId="preview"
               sizes="100vw"
               // src="/watermarknew.png"
-              src={`/api/public/${params.id}`}
+              src={`${location.hostname}/api/public/${params.id}`}
               className="object-contain h-screen w-screen fixed z-50 inset-0"
               alt="preview"
             />
